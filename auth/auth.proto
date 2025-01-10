@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package exchange;
+
+option go_package = "github.com/HennOgyrchik/proto-jwt-auth";
+
+// Определение сервиса
+service Auth {
+  // Регистрация нового пользователя
+  rpc CreateUser(CreateUserRequest) returns (Empty);
+
+  // Авторизация пользователя
+  rpc UserAuthorization(UserAuth) returns (TokenReply);
+}
+
+// Запрос на регистрацию пользователя
+message CreateUserRequest {
+  string login = 1;
+  string password = 2;
+  string email = 3;
+}
+
+//Запрос на авторизацию
+message UserAuth {
+  string login = 1;
+  string password =2;
+}
+
+//Access-токен
+message TokenReply {
+  string token = 1;
+}
+
+// Пустое сообщение
+message Empty {}
