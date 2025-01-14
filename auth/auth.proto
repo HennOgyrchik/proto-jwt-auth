@@ -7,7 +7,7 @@ option go_package = "github.com/HennOgyrchik/proto-jwt-auth";
 // Определение сервиса
 service Authorization {
   // Регистрация нового пользователя
-  rpc CreateUser(CreateUserRequest) returns (Empty);
+  rpc CreateUser(CreateUserRequest) returns (EmptyMessage);
 
   // Авторизация пользователя
   rpc Login(LoginRequest) returns (Token);
@@ -40,4 +40,4 @@ message VerifyTokenResponse {
 }
 
 // Пустое сообщение
-message Empty {}
+message EmptyMessage {}
