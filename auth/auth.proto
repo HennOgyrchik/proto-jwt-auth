@@ -5,30 +5,38 @@ package exchange;
 option go_package = "github.com/HennOgyrchik/proto-jwt-auth";
 
 // Определение сервиса
-service Auth {
+service Authorization {
   // Регистрация нового пользователя
   rpc CreateUser(CreateUserRequest) returns (Empty);
 
   // Авторизация пользователя
-  rpc UserAuthorization(UserAuth) returns (TokenReply);
+  rpc Login(LoginRequest) returns (Token);
+
+  // Проверка токена
+  rpc VerifyToken(Token) returns (VerifyTokenResponse);
 }
 
 // Запрос на регистрацию пользователя
 message CreateUserRequest {
-  string login = 1;
+  string username = 1;
   string password = 2;
   string email = 3;
 }
 
 //Запрос на авторизацию
-message UserAuth {
-  string login = 1;
+message LoginRequest {
+  string username = 1;
   string password =2;
 }
 
 //Access-токен
-message TokenReply {
+message Token {
   string token = 1;
+}
+
+// Ok or !ok
+message VerifyTokenResponse {
+ bool ok = 1;
 }
 
 // Пустое сообщение

@@ -19,130 +19,169 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Auth_CreateUser_FullMethodName        = "/exchange.Auth/CreateUser"
-	Auth_UserAuthorization_FullMethodName = "/exchange.Auth/UserAuthorization"
+	Authorization_CreateUser_FullMethodName  = "/exchange.Authorization/CreateUser"
+	Authorization_Login_FullMethodName       = "/exchange.Authorization/Login"
+	Authorization_VerifyToken_FullMethodName = "/exchange.Authorization/VerifyToken"
 )
 
-// AuthClient is the client API for Auth service.
+// AuthorizationClient is the client API for Authorization service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type AuthClient interface {
+type AuthorizationClient interface {
 	// Регистрация нового пользователя
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*Empty, error)
 	// Авторизация пользователя
-	UserAuthorization(ctx context.Context, in *UserAuth, opts ...grpc.CallOption) (*TokenReply, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*Token, error)
+	// Проверка токена
+	VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*VerifyTokenResponse, error)
 }
 
-type authClient struct {
+type authorizationClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewAuthClient(cc grpc.ClientConnInterface) AuthClient {
-	return &authClient{cc}
+func NewAuthorizationClient(cc grpc.ClientConnInterface) AuthorizationClient {
+	return &authorizationClient{cc}
 }
 
-func (c *authClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*Empty, error) {
+func (c *authorizationClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*Empty, error) {
 	out := new(Empty)
-	err := c.cc.Invoke(ctx, Auth_CreateUser_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Authorization_CreateUser_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *authClient) UserAuthorization(ctx context.Context, in *UserAuth, opts ...grpc.CallOption) (*TokenReply, error) {
-	out := new(TokenReply)
-	err := c.cc.Invoke(ctx, Auth_UserAuthorization_FullMethodName, in, out, opts...)
+func (c *authorizationClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*Token, error) {
+	out := new(Token)
+	err := c.cc.Invoke(ctx, Authorization_Login_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// AuthServer is the server API for Auth service.
-// All implementations must embed UnimplementedAuthServer
+func (c *authorizationClient) VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*VerifyTokenResponse, error) {
+	out := new(VerifyTokenResponse)
+	err := c.cc.Invoke(ctx, Authorization_VerifyToken_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// AuthorizationServer is the server API for Authorization service.
+// All implementations must embed UnimplementedAuthorizationServer
 // for forward compatibility
-type AuthServer interface {
+type AuthorizationServer interface {
 	// Регистрация нового пользователя
 	CreateUser(context.Context, *CreateUserRequest) (*Empty, error)
 	// Авторизация пользователя
-	UserAuthorization(context.Context, *UserAuth) (*TokenReply, error)
-	mustEmbedUnimplementedAuthServer()
+	Login(context.Context, *LoginRequest) (*Token, error)
+	// Проверка токена
+	VerifyToken(context.Context, *Token) (*VerifyTokenResponse, error)
+	mustEmbedUnimplementedAuthorizationServer()
 }
 
-// UnimplementedAuthServer must be embedded to have forward compatible implementations.
-type UnimplementedAuthServer struct {
+// UnimplementedAuthorizationServer must be embedded to have forward compatible implementations.
+type UnimplementedAuthorizationServer struct {
 }
 
-func (UnimplementedAuthServer) CreateUser(context.Context, *CreateUserRequest) (*Empty, error) {
+func (UnimplementedAuthorizationServer) CreateUser(context.Context, *CreateUserRequest) (*Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedAuthServer) UserAuthorization(context.Context, *UserAuth) (*TokenReply, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UserAuthorization not implemented")
+func (UnimplementedAuthorizationServer) Login(context.Context, *LoginRequest) (*Token, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedAuthServer) mustEmbedUnimplementedAuthServer() {}
+func (UnimplementedAuthorizationServer) VerifyToken(context.Context, *Token) (*VerifyTokenResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method VerifyToken not implemented")
+}
+func (UnimplementedAuthorizationServer) mustEmbedUnimplementedAuthorizationServer() {}
 
-// UnsafeAuthServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to AuthServer will
+// UnsafeAuthorizationServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AuthorizationServer will
 // result in compilation errors.
-type UnsafeAuthServer interface {
-	mustEmbedUnimplementedAuthServer()
+type UnsafeAuthorizationServer interface {
+	mustEmbedUnimplementedAuthorizationServer()
 }
 
-func RegisterAuthServer(s grpc.ServiceRegistrar, srv AuthServer) {
-	s.RegisterService(&Auth_ServiceDesc, srv)
+func RegisterAuthorizationServer(s grpc.ServiceRegistrar, srv AuthorizationServer) {
+	s.RegisterService(&Authorization_ServiceDesc, srv)
 }
 
-func _Auth_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Authorization_CreateUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateUserRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServer).CreateUser(ctx, in)
+		return srv.(AuthorizationServer).CreateUser(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Auth_CreateUser_FullMethodName,
+		FullMethod: Authorization_CreateUser_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).CreateUser(ctx, req.(*CreateUserRequest))
+		return srv.(AuthorizationServer).CreateUser(ctx, req.(*CreateUserRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Auth_UserAuthorization_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UserAuth)
+func _Authorization_Login_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LoginRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(AuthServer).UserAuthorization(ctx, in)
+		return srv.(AuthorizationServer).Login(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: Auth_UserAuthorization_FullMethodName,
+		FullMethod: Authorization_Login_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthServer).UserAuthorization(ctx, req.(*UserAuth))
+		return srv.(AuthorizationServer).Login(ctx, req.(*LoginRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// Auth_ServiceDesc is the grpc.ServiceDesc for Auth service.
+func _Authorization_VerifyToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Token)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizationServer).VerifyToken(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Authorization_VerifyToken_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizationServer).VerifyToken(ctx, req.(*Token))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// Authorization_ServiceDesc is the grpc.ServiceDesc for Authorization service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var Auth_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "exchange.Auth",
-	HandlerType: (*AuthServer)(nil),
+var Authorization_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "exchange.Authorization",
+	HandlerType: (*AuthorizationServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "CreateUser",
-			Handler:    _Auth_CreateUser_Handler,
+			Handler:    _Authorization_CreateUser_Handler,
 		},
 		{
-			MethodName: "UserAuthorization",
-			Handler:    _Auth_UserAuthorization_Handler,
+			MethodName: "Login",
+			Handler:    _Authorization_Login_Handler,
+		},
+		{
+			MethodName: "VerifyToken",
+			Handler:    _Authorization_VerifyToken_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
