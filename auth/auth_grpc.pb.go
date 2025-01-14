@@ -29,7 +29,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type AuthorizationClient interface {
 	// Регистрация нового пользователя
-	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*EmptyMessage, error)
+	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	// Авторизация пользователя
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*Token, error)
 	// Проверка токена
@@ -44,8 +44,8 @@ func NewAuthorizationClient(cc grpc.ClientConnInterface) AuthorizationClient {
 	return &authorizationClient{cc}
 }
 
-func (c *authorizationClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*EmptyMessage, error) {
-	out := new(EmptyMessage)
+func (c *authorizationClient) CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error) {
+	out := new(CreateUserResponse)
 	err := c.cc.Invoke(ctx, Authorization_CreateUser_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -76,7 +76,7 @@ func (c *authorizationClient) VerifyToken(ctx context.Context, in *Token, opts .
 // for forward compatibility
 type AuthorizationServer interface {
 	// Регистрация нового пользователя
-	CreateUser(context.Context, *CreateUserRequest) (*EmptyMessage, error)
+	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	// Авторизация пользователя
 	Login(context.Context, *LoginRequest) (*Token, error)
 	// Проверка токена
@@ -88,7 +88,7 @@ type AuthorizationServer interface {
 type UnimplementedAuthorizationServer struct {
 }
 
-func (UnimplementedAuthorizationServer) CreateUser(context.Context, *CreateUserRequest) (*EmptyMessage, error) {
+func (UnimplementedAuthorizationServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
 func (UnimplementedAuthorizationServer) Login(context.Context, *LoginRequest) (*Token, error) {
