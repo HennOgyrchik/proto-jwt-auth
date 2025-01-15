@@ -31,9 +31,9 @@ type AuthorizationClient interface {
 	// Регистрация нового пользователя
 	CreateUser(ctx context.Context, in *CreateUserRequest, opts ...grpc.CallOption) (*CreateUserResponse, error)
 	// Авторизация пользователя
-	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*Token, error)
+	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*TokenResponse, error)
 	// Проверка токена
-	VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*VerifyTokenResponse, error)
+	VerifyToken(ctx context.Context, in *TokenReuest, opts ...grpc.CallOption) (*VerifyTokenResponse, error)
 }
 
 type authorizationClient struct {
@@ -53,8 +53,8 @@ func (c *authorizationClient) CreateUser(ctx context.Context, in *CreateUserRequ
 	return out, nil
 }
 
-func (c *authorizationClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*Token, error) {
-	out := new(Token)
+func (c *authorizationClient) Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*TokenResponse, error) {
+	out := new(TokenResponse)
 	err := c.cc.Invoke(ctx, Authorization_Login_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func (c *authorizationClient) Login(ctx context.Context, in *LoginRequest, opts 
 	return out, nil
 }
 
-func (c *authorizationClient) VerifyToken(ctx context.Context, in *Token, opts ...grpc.CallOption) (*VerifyTokenResponse, error) {
+func (c *authorizationClient) VerifyToken(ctx context.Context, in *TokenReuest, opts ...grpc.CallOption) (*VerifyTokenResponse, error) {
 	out := new(VerifyTokenResponse)
 	err := c.cc.Invoke(ctx, Authorization_VerifyToken_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -78,9 +78,9 @@ type AuthorizationServer interface {
 	// Регистрация нового пользователя
 	CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error)
 	// Авторизация пользователя
-	Login(context.Context, *LoginRequest) (*Token, error)
+	Login(context.Context, *LoginRequest) (*TokenResponse, error)
 	// Проверка токена
-	VerifyToken(context.Context, *Token) (*VerifyTokenResponse, error)
+	VerifyToken(context.Context, *TokenReuest) (*VerifyTokenResponse, error)
 	mustEmbedUnimplementedAuthorizationServer()
 }
 
@@ -91,10 +91,10 @@ type UnimplementedAuthorizationServer struct {
 func (UnimplementedAuthorizationServer) CreateUser(context.Context, *CreateUserRequest) (*CreateUserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateUser not implemented")
 }
-func (UnimplementedAuthorizationServer) Login(context.Context, *LoginRequest) (*Token, error) {
+func (UnimplementedAuthorizationServer) Login(context.Context, *LoginRequest) (*TokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Login not implemented")
 }
-func (UnimplementedAuthorizationServer) VerifyToken(context.Context, *Token) (*VerifyTokenResponse, error) {
+func (UnimplementedAuthorizationServer) VerifyToken(context.Context, *TokenReuest) (*VerifyTokenResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method VerifyToken not implemented")
 }
 func (UnimplementedAuthorizationServer) mustEmbedUnimplementedAuthorizationServer() {}
@@ -147,7 +147,7 @@ func _Authorization_Login_Handler(srv interface{}, ctx context.Context, dec func
 }
 
 func _Authorization_VerifyToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Token)
+	in := new(TokenReuest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -159,7 +159,7 @@ func _Authorization_VerifyToken_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: Authorization_VerifyToken_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthorizationServer).VerifyToken(ctx, req.(*Token))
+		return srv.(AuthorizationServer).VerifyToken(ctx, req.(*TokenReuest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

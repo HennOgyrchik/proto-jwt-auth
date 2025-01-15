@@ -10,10 +10,10 @@ service Authorization {
   rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
 
   // Авторизация пользователя
-  rpc Login(LoginRequest) returns (Token);
+  rpc Login(LoginRequest) returns (TokenResponse);
 
   // Проверка токена
-  rpc VerifyToken(Token) returns (VerifyTokenResponse);
+  rpc VerifyToken(TokenReuest) returns (VerifyTokenResponse);
 }
 
 // Запрос на регистрацию пользователя
@@ -36,8 +36,13 @@ message LoginRequest {
 }
 
 //Access-токен
-message Token {
+message TokenResponse {
   string value = 1;
+}
+
+message TokenReuest {
+  string userId =1;
+  string token = 2;
 }
 
 // Ok or !ok
